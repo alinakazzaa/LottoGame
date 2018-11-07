@@ -2,6 +2,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -10,7 +12,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.sql*;
+import java.sql.*;
+
 
 //Don't forget to add the servlet-api.jar to your classpath. It's in the lib folder in Tomcat.
 
@@ -90,16 +93,36 @@ public class AlinaServlet extends HttpServlet {
 	      doGet(request, response);
 	   }
 	
-	public static void main (String[]args) {
+	public static void main (String[]args) throws Exception {
 		
-		Class.forName("com.mysql.jdbc.Driver").newInstance();
-		Connection connection = DriverManager.getConnection("jdbc:mysql://localhost/lottoNumbers/dt354jdbc");
+		Class.forName("com.mysql.jdbc.Driver").newInstance(); // load the driver
+		Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/dt354jdbc" + "user=root&password=RootRoot");
 		
 		Statement statement = connection.createStatement();
 		
 		//
-		// insert into table
+		// insert data into database/ table
 		statement.executeUpdate("INSERT INTO user(username, password) " + "VALUES ('Alina', '1234');");
+		
+		PreparedStatement createUser = connection.prepareStatement(
+				"INSERT INTO user(username, passrowd) " + "VALUES(?,?);");
+		
+		//createUser.setString(1, "Jane");
+		
+		int rowsUpdated = createUser.executeUpdate();
+		createUser.close();
+		
+		
+		//Select data fro database
+		
+		Statement select = connection.createStatement();
+		
+		ResultSet rs = select.executeQuery("SELECT * FROM user");
+		while(rs.next()) {
+			System.out.println("Column 1 values: " + rs.getString(1));
+			System.out.println("Column 2 values: " + rs.getString(2));
+		}
+		
 		
 		
 		
