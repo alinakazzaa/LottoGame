@@ -1,10 +1,5 @@
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -15,13 +10,39 @@ import javax.servlet.http.HttpServletResponse;
 import java.sql.*;
 
 
-//Don't forget to add the servlet-api.jar to your classpath. It's in the lib folder in Tomcat.
-
 public class AlinaServlet extends HttpServlet {
+
+	// establish connection
+	Connection connection = DriverManager.getConnection ("jdbc:mysql://localhost:3306/dt354jdbc?"+"user=root&password=RootRoot");
+	// initialize
+	PreparedStatement createUser;
+	ResultSet result;
+	HttpServletResponse response;
+	
+	
+	
+	public AlinaServlet() throws Exception {
+		
+		createUser = connection.prepareStatement("INSERT into user (username, password)" +" VALUES (?, ?)"); // request SQL insert statement
+		
+	}
 
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
-		String one, two, three, four, five, six;
+		PrintWriter out = response.getWriter(); // print writer
+		response.setContentType("text/html");
+		String docType = "<!DOCTYPE HTML PUBLIC \" -//W3C//DTD HTML 4.0 " + "Transitional//EN\">\n";
+								// values come from text fields username and password
+		try {
+			
+		createUser.setString(1, request.getParameter("username").toString()); createUser.setString(2, request.getParameter("password").toString()); // set values in table 
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+		/*String one, two, three, four, five, six;
 		one = request.getParameter("num1");
 		two = request.getParameter("num2");
 		three = request.getParameter("num3");
@@ -29,11 +50,10 @@ public class AlinaServlet extends HttpServlet {
 		five = request.getParameter("num5");
 		six = request.getParameter("num6");
 		ArrayList<Integer> nums = new ArrayList<Integer>();
-		PrintWriter out = response.getWriter(); // print writer
-		response.setContentType("text/html");
-		String docType = "<!DOCTYPE HTML PUBLIC \" -//W3C//DTD HTML 4.0 " + "Transitional//EN\">\n";
+		
 		
 		try {
+			
 		if (Integer.parseInt(one) < 1 || Integer.parseInt(one) > 47 || Integer.parseInt(two) < 1 || Integer.parseInt(two) > 47 ||
 				Integer.parseInt(three) < 1 || Integer.parseInt(three) > 47 ||
 				Integer.parseInt(four) < 1 || Integer.parseInt(four) > 47 ||
@@ -81,6 +101,7 @@ public class AlinaServlet extends HttpServlet {
 					"<a href = http://localhost:8080/AlinaLotto/index.html>Back</a>\n" + "</BODY>\n" + "</HTML>");
 			
 		}
+		*/
 		
 	out.close();
 
@@ -95,37 +116,13 @@ public class AlinaServlet extends HttpServlet {
 	
 	public static void main (String[]args) throws Exception {
 		
-		Class.forName("com.mysql.jdbc.Driver").newInstance(); // load the driver
-		Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/dt354jdbc" + "user=root&password=RootRoot");
+		Class.forName("com.mysql.cj.jdbc.Driver").newInstance();
 		
-		Statement statement = connection.createStatement();
+	}
+	
+	public void logInSystem() throws IOException {
 		
-		//
-		// insert data into database/ table
-		statement.executeUpdate("INSERT INTO user(username, password) " + "VALUES ('Alina', '1234');");
-		
-		PreparedStatement createUser = connection.prepareStatement(
-				"INSERT INTO user(username, passrowd) " + "VALUES(?,?);");
-		
-		//createUser.setString(1, "Jane");
-		
-		int rowsUpdated = createUser.executeUpdate();
-		createUser.close();
-		
-		
-		//Select data fro database
-		
-		Statement select = connection.createStatement();
-		
-		ResultSet rs = select.executeQuery("SELECT * FROM user");
-		while(rs.next()) {
-			System.out.println("Column 1 values: " + rs.getString(1));
-			System.out.println("Column 2 values: " + rs.getString(2));
-		}
-		
-		
-		
-		
+		response.sendRedirect("/inputNumbers.html");
 		
 	}
 }
